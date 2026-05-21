@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Waves } from 'lucide-react'
@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/Button'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 
-export default function LoginPage() {
+function LoginForm() {
   const { firebaseUser, loading, dbUser } = useAuth()
   const { toast } = useToast()
   const router = useRouter()
@@ -26,7 +26,6 @@ export default function LoginPage() {
   const returnUrl = searchParams.get('returnUrl') ?? '/'
   const [googleLoading, setGoogleLoading] = useState(false)
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!loading && firebaseUser) {
       const dest = dbUser?.role === 'ADMIN' ? '/admin' : returnUrl
@@ -43,7 +42,6 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginInput) => {
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password)
-      // AuthContext onAuthStateChanged handles the DB sync + redirect
     } catch {
       toast('Incorrect email or password', 'error')
     }
@@ -75,7 +73,6 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
-          {/* Google */}
           <Button
             variant="secondary"
             fullWidth
@@ -99,7 +96,6 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
-          {/* Email form */}
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
             <Input
               label="Email Address"
@@ -139,5 +135,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <Waves size={32} className="text-teal animate-pulse" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   )
 }

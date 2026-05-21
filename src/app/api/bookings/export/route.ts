@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { requireAdmin, ApiError } from '@/lib/api-auth'
 import { prisma } from '@/lib/prisma'
 import { formatDateTime, formatDateShort } from '@/lib/utils'
