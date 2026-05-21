@@ -1,0 +1,18 @@
+export const ROUTES = {
+  home: '/',
+  trips: '/trips',
+  trip: (id: string) => `/trips/${id}`,
+  book: (tripId: string) => `/book/${tripId}`,
+  bookingConfirmation: (bookingId: string) => `/booking/confirmation/${bookingId}`,
+  login: '/login',
+  register: '/register',
+  forgotPassword: '/forgot-password',
+  account: '/account',
+  accountBookings: '/account/bookings',
+  admin: '/admin',
+  adminTrips: '/admin/trips',
+  adminTripsNew: '/admin/trips/new',
+  adminTrip: (id: string) => `/admin/trips/${id}`,
+  adminBookings: '/admin/bookings',
+  adminBooking: (id: string) => `/admin/bookings/${id}`,
+} as const

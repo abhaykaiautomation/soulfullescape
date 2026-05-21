@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(curl -s http://localhost:3001/api/trips)",
+      "Bash(node -e \"const d=require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\); const j=JSON.parse\\(d\\); j.data.forEach\\(t=>console.log\\(t.title,'|',t.spotsRemaining,'spots |','$'+t.pricePerPerson\\)\\); console.log\\('Count:',j.count\\)\")",
+      "Bash(sleep 2 && cat /tmp/nextjs.log | tail -5)",
+      "Read(//tmp/**)"
+    ]
+  }
+}

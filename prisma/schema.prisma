@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+enum UserRole {
+  GUEST
+  ADMIN
+}
+
+enum TripStatus {
+  DRAFT
+  PUBLISHED
+  FULL
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id          String    @id @default(cuid())
+  firebaseUid String    @unique @map("firebase_uid")
+  name        String
+  email       String    @unique
+  phone       String?
+  role        UserRole  @default(GUEST)
+  bookings    Booking[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Trip {
+  id             String      @id @default(cuid())
+  title          String
+  description    String
+  tripDate       DateTime    @map("trip_date")
+  startTime      String      @map("start_time")
+  endTime        String      @map("end_time")
+  capacity       Int
+  spotsBooked    Int         @default(0) @map("spots_booked")
+  pricePerPerson Decimal     @map("price_per_person") @db.Decimal(10, 2)
+  status         TripStatus  @default(DRAFT)
+  bookings       Booking[]
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  @@index([tripDate])
+  @@index([status])
+  @@map("trips")
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  userId         String        @map("user_id")
+  tripId         String        @map("trip_id")
+  customerName   String        @map("customer_name")
+  customerEmail  String        @map("customer_email")
+  whatsappPhone  String        @map("whatsapp_phone")
+  spotsReserved  Int           @map("spots_reserved")
+  pricePerPerson Decimal       @map("price_per_person") @db.Decimal(10, 2)
+  totalPrice     Decimal       @map("total_price") @db.Decimal(10, 2)
+  status         BookingStatus @default(CONFIRMED)
+  user           User          @relation(fields: [userId], references: [id])
+  trip           Trip          @relation(fields: [tripId], references: [id])
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([tripId])
+  @@index([createdAt])
+  @@map("bookings")
+}
