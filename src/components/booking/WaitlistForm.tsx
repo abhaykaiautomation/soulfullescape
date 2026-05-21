@@ -51,7 +51,12 @@ export function WaitlistForm({ trip }: WaitlistFormProps) {
 
     try {
       const token = await firebaseUser.getIdToken()
-      const normalised = { ...data, whatsappPhone: normalisePhone(data.whatsappPhone) }
+      // Always use trip.id from the prop — hidden inputs are unreliable in RHF
+      const normalised = {
+        ...data,
+        tripId: trip.id,
+        whatsappPhone: normalisePhone(data.whatsappPhone),
+      }
 
       const result = await apiRequest<{ data: { id: string } }>('/api/waitlist', {
         method: 'POST',
@@ -77,8 +82,6 @@ export function WaitlistForm({ trip }: WaitlistFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-      <input type="hidden" {...register('tripId')} />
-
       <Input
         label="Your Name"
         autoComplete="name"
