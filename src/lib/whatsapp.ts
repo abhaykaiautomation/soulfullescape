@@ -10,10 +10,14 @@ export interface WhatsAppPayload {
   endTime: string
   spotsReserved: number
   totalPrice: number
+  waitlistPosition?: number  // present → send waitlist message instead of booking confirmation
 }
 
 export async function sendWhatsAppConfirmation(payload: WhatsAppPayload): Promise<void> {
-  const message = buildConfirmationMessage(payload)
+  const message = payload.waitlistPosition
+    ? buildWaitlistMessage(payload)
+    : buildConfirmationMessage(payload)
+
   const url = `https://api.twilio.com/2010-04-01/Accounts/${config.twilioAccountSid}/Messages.json`
 
   const res = await fetch(url, {
@@ -39,7 +43,7 @@ export async function sendWhatsAppConfirmation(payload: WhatsAppPayload): Promis
 
 function buildConfirmationMessage(payload: WhatsAppPayload): string {
   const dateStr = formatDate(payload.tripDate)
-  const lines = [
+  return [
     `🌊 *Soulfullescape — Booking Confirmed!*`,
     ``,
     `Hi ${payload.customerName},`,
@@ -55,6 +59,26 @@ function buildConfirmationMessage(payload: WhatsAppPayload): string {
     `We can't wait to see you there. Get ready to escape, connect, and recharge! 🌿`,
     ``,
     `Questions? Reply to this message.`,
-  ]
-  return lines.join('\n')
+  ].join('\n')
+}
+
+function buildWaitlistMessage(payload: WhatsAppPayload): string {
+  const dateStr = formatDate(payload.tripDate)
+  return [
+    `📋 *Soulfullescape — You're on the Waitlist!*`,
+    ``,
+    `Hi ${payload.customerName},`,
+    ``,
+    `This trip is currently full, but you've been added to the waitlist:`,
+    ``,
+    `📅 *Trip:* ${payload.tripTitle}`,
+    `🗓 *Date:* ${dateStr}`,
+    `⏰ *Time:* ${payload.startTime} – ${payload.endTime}`,
+    `👥 *Spots Requested:* ${payload.spotsReserved}`,
+    `🔢 *Your Position:* #${payload.waitlistPosition}`,
+    ``,
+    `We'll contact you here if a spot opens up. Fingers crossed! 🤞`,
+    ``,
+    `Questions? Reply to this message.`,
+  ].join('\n')
 }

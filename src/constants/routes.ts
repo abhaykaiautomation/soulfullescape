@@ -15,4 +15,6 @@ export const ROUTES = {
   adminTrip: (id: string) => `/admin/trips/${id}`,
   adminBookings: '/admin/bookings',
   adminBooking: (id: string) => `/admin/bookings/${id}`,
+  waitlist: (tripId: string) => `/waitlist/${tripId}`,
+  waitlistConfirmation: (waitlistId: string) => `/waitlist/confirmation/${waitlistId}`,
 } as const

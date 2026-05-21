@@ -1,7 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { ClipboardList } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
@@ -30,16 +30,26 @@ export function BookingCTA({
   const isFull = tripStatus === 'FULL' || spotsRemaining <= 0
 
   const handleBook = () => {
+    const dest = ROUTES.book(tripId)
     if (!firebaseUser) {
-      router.push(`/login?returnUrl=${encodeURIComponent(ROUTES.book(tripId))}`)
+      router.push(`/login?returnUrl=${encodeURIComponent(dest)}`)
     } else {
-      router.push(ROUTES.book(tripId))
+      router.push(dest)
+    }
+  }
+
+  const handleWaitlist = () => {
+    const dest = ROUTES.waitlist(tripId)
+    if (!firebaseUser) {
+      router.push(`/login?returnUrl=${encodeURIComponent(dest)}`)
+    } else {
+      router.push(dest)
     }
   }
 
   return (
     <div className="space-y-4">
-      {/* Availability indicator */}
+      {/* Availability badge */}
       {isFull ? (
         <Badge variant="error" dot className="text-sm">Sold Out</Badge>
       ) : spotsRemaining === 1 ? (
@@ -56,18 +66,30 @@ export function BookingCTA({
       </div>
 
       {isFull ? (
-        <Button fullWidth disabled>
-          Sold Out
-        </Button>
+        <div className="space-y-3">
+          <Button
+            fullWidth
+            size="lg"
+            onClick={handleWaitlist}
+            className="bg-gold text-navy hover:bg-gold-dark focus-visible:ring-gold"
+            leftIcon={<ClipboardList size={18} />}
+          >
+            {firebaseUser ? 'Join Waitlist' : 'Sign In to Join Waitlist'}
+          </Button>
+          <p className="text-xs text-center text-gray-400">
+            Free to join — we'll WhatsApp you if a spot opens
+          </p>
+        </div>
       ) : (
-        <Button fullWidth size="lg" onClick={handleBook}>
-          {firebaseUser ? 'Book This Trip' : 'Sign In to Book'}
-        </Button>
+        <div className="space-y-3">
+          <Button fullWidth size="lg" onClick={handleBook}>
+            {firebaseUser ? 'Book This Trip' : 'Sign In to Book'}
+          </Button>
+          <p className="text-xs text-center text-gray-400">
+            Confirmation sent via WhatsApp instantly
+          </p>
+        </div>
       )}
-
-      <p className="text-xs text-center text-gray-400">
-        Confirmation sent via WhatsApp instantly
-      </p>
     </div>
   )
 }

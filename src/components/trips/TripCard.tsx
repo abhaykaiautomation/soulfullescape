@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Calendar, Clock, Users, DollarSign } from 'lucide-react'
+import { Calendar, Clock, Users, DollarSign, ClipboardList } from 'lucide-react'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatDateShort, formatCurrency } from '@/lib/utils'
@@ -62,10 +62,18 @@ export function TripCard({ trip }: TripCardProps) {
         <div className="mt-auto space-y-3">
           <SpotIndicator remaining={trip.spotsRemaining} />
 
-          {isUnavailable ? (
-            <Button variant="secondary" fullWidth disabled>
-              {isCancelled ? 'Cancelled' : 'Sold Out'}
-            </Button>
+          {isCancelled ? (
+            <Button variant="secondary" fullWidth disabled>Cancelled</Button>
+          ) : isFull ? (
+            <Link href={ROUTES.waitlist(trip.id)} className="block">
+              <Button
+                fullWidth
+                leftIcon={<ClipboardList size={16} />}
+                className="bg-gold text-navy hover:bg-gold-dark focus-visible:ring-gold"
+              >
+                Join Waitlist
+              </Button>
+            </Link>
           ) : (
             <Link href={ROUTES.trip(trip.id)} className="block">
               <Button fullWidth>View & Book</Button>
