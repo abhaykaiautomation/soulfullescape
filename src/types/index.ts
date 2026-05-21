@@ -3,17 +3,17 @@ import type { User, Trip, Booking, UserRole, TripStatus, BookingStatus } from '@
 // Re-export Prisma types
 export type { User, Trip, Booking, UserRole, TripStatus, BookingStatus }
 
-// API response shapes
-export interface TripWithComputed extends Trip {
+// API response shapes — Decimal fields replaced with number for JSON serialisation
+export interface TripWithComputed extends Omit<Trip, 'pricePerPerson'> {
+  pricePerPerson: number
   spotsRemaining: number
   maxBookable: number
-  pricePerPerson: number
 }
 
-export interface BookingWithTrip extends Booking {
-  trip: Pick<Trip, 'id' | 'title' | 'tripDate' | 'startTime' | 'endTime'>
-  totalPrice: number
+export interface BookingWithTrip extends Omit<Booking, 'pricePerPerson' | 'totalPrice'> {
   pricePerPerson: number
+  totalPrice: number
+  trip: Pick<Trip, 'id' | 'title' | 'tripDate' | 'startTime' | 'endTime'>
 }
 
 export interface AdminStats {
