@@ -13,11 +13,14 @@ export const revalidate = 30
 
 async function getTrips(): Promise<TripWithComputed[]> {
   const trips = await prisma.trip.findMany({
-    where: { status: 'PUBLISHED', tripDate: { gte: new Date() } },
+    where: {
+      status: { in: ['PUBLISHED', 'FULL'] },
+      tripDate: { gte: new Date() },
+    },
     orderBy: { tripDate: 'asc' },
   })
 
-  return trips.map((t) => {
+  const withComputed = trips.map((t) => {
     const spotsRemaining = t.capacity - t.spotsBooked
     return {
       ...t,
@@ -26,6 +29,12 @@ async function getTrips(): Promise<TripWithComputed[]> {
       maxBookable: Math.min(10, spotsRemaining),
     }
   })
+
+  // Available trips first, sold-out trips at the end (each group sorted by date)
+  return [
+    ...withComputed.filter((t) => t.status === 'PUBLISHED'),
+    ...withComputed.filter((t) => t.status === 'FULL'),
+  ]
 }
 
 export default async function TripsPage() {
